@@ -9,10 +9,10 @@ import { getUserId, parseLimitParameter, parseNextKeyParameter } from '../utils'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const id = getUserId(event)
+    const userId = getUserId(event)
     const nextKey = parseNextKeyParameter(event)
     const limit = parseLimitParameter(event) || 20
-    const result = await getTodosForUser(id, nextKey, limit)
+    const result = await getTodosForUser(userId, nextKey, limit)
 
     return {
       statusCode: 200,

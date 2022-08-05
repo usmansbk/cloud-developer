@@ -46,22 +46,23 @@ export const createTodo = async (
 }
 
 export const updateTodo = async (
-  id: string,
+  todoId: string,
+  userId: string,
   input: UpdateTodoRequest
 ): Promise<TodoItem> => {
   logger.info('updateTodo')
   try {
-    return TodosAccess.update(id, input)
+    return TodosAccess.update(todoId, userId, input)
   } catch (e) {
     logger.error(e)
     throw new createError.BadRequest(e)
   }
 }
 
-export const deleteTodo = async (id: string) => {
+export const deleteTodo = async (todoId: string, userId: string) => {
   logger.info('deleteTodo')
   try {
-    return TodosAccess.delete(id)
+    return TodosAccess.delete(todoId, userId)
   } catch (e) {
     logger.error(e)
     throw new createError.BadRequest(e)

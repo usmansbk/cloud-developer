@@ -65,6 +65,7 @@ export class TodosAccess {
 
   static async update(
     todoId: string,
+    userId: string,
     attributes: TodoUpdate
   ): Promise<TodoItem> {
     logger.info({
@@ -77,7 +78,8 @@ export class TodosAccess {
       .update({
         TableName: todosTable,
         Key: {
-          todoId
+          todoId,
+          userId
         }
       })
       .promise()
@@ -85,7 +87,7 @@ export class TodosAccess {
     return todo as TodoItem
   }
 
-  static async delete(todoId: string): Promise<TodoItem> {
+  static async delete(todoId: string, userId: string): Promise<TodoItem> {
     logger.info({
       action: 'Delete',
       todoId
@@ -95,7 +97,8 @@ export class TodosAccess {
       .delete({
         TableName: todosTable,
         Key: {
-          todoId
+          todoId,
+          userId
         }
       })
       .promise()
