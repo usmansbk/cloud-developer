@@ -10,15 +10,16 @@ import { Key } from 'aws-sdk/clients/dynamodb'
 
 // TODO: Implement businessLogic
 
-const logger = createLogger('Todos')
+const logger = createLogger('businessLogic')
 
 export const getTodosForUser = async (
-  id: string,
+  userId: string,
   nextKey: Key | null,
   limit: number
 ): Promise<{ items: TodoItem[]; nextKey: string | null }> => {
+  logger.info('getTodosForUser')
   try {
-    return TodosAccess.getManyByUserId(id, nextKey, limit)
+    return TodosAccess.getManyByUserId(userId, nextKey, limit)
   } catch (e) {
     logger.error(e)
     throw new createError.BadRequest(e)
@@ -29,6 +30,7 @@ export const createTodo = async (
   input: CreateTodoRequest,
   userId: string
 ): Promise<TodoItem> => {
+  logger.info('createTodo')
   try {
     return TodosAccess.create({
       ...input,
@@ -47,6 +49,7 @@ export const updateTodo = async (
   id: string,
   input: UpdateTodoRequest
 ): Promise<TodoItem> => {
+  logger.info('updateTodo')
   try {
     return TodosAccess.update(id, input)
   } catch (e) {
@@ -56,6 +59,7 @@ export const updateTodo = async (
 }
 
 export const deleteTodo = async (id: string) => {
+  logger.info('deleteTodo')
   try {
     return TodosAccess.delete(id)
   } catch (e) {

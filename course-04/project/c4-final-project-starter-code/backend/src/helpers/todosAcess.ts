@@ -5,7 +5,7 @@ import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
 
-const XAWS = AWSXRay.captureAWS(AWS)
+AWSXRay.captureAWS(AWS)
 
 const dbClient = new DocumentClient()
 const todosTable = process.env.TODOS_TABLE
@@ -24,17 +24,19 @@ function encodeNextKey(key: Key) {
 export class TodosAccess {
   static async getManyByUserId(
     userId: string,
-    startKey: Key | null,
+    after: Key | null,
     limit: number
   ): Promise<{ items: TodoItem[]; nextKey: string | null }> {
     logger.info({
-      action: 'GET_ALL',
-      userId
+      action: 'Query',
+      userId,
+      limit,
+      after
     })
     const { Items: items, LastEvaluatedKey } = await dbClient
       .query({
         TableName: todosTable,
-        ExclusiveStartKey: startKey,
+        ExclusiveStartKey: after,
         Limit: limit
       })
       .promise()
@@ -46,6 +48,11 @@ export class TodosAccess {
   }
 
   static async create(item: TodoItem): Promise<TodoItem> {
+    logger.info({
+      action: 'Create',
+      item
+    })
+
     const { Attributes: todo } = await dbClient
       .put({
         TableName: todosTable,
@@ -53,42 +60,45 @@ export class TodosAccess {
       })
       .promise()
 
-    logger.info({
-      action: 'CREATE',
-      todo
-    })
-
     return todo as TodoItem
   }
 
-  static async update(id: string, attributes: TodoUpdate): Promise<TodoItem> {
+  static async update(
+    todoId: string,
+    attributes: TodoUpdate
+  ): Promise<TodoItem> {
+    logger.info({
+      action: 'Update',
+      todoId,
+      attributes
+    })
+
     const { Attributes: todo } = await dbClient
       .update({
         TableName: todosTable,
-        Key: id as unknown as Key
+        Key: {
+          todoId
+        }
       })
       .promise()
-
-    logger.info({
-      action: 'UPDATE',
-      todo
-    })
 
     return todo as TodoItem
   }
 
-  static async delete(id: string): Promise<TodoItem> {
+  static async delete(todoId: string): Promise<TodoItem> {
+    logger.info({
+      action: 'Delete',
+      todoId
+    })
+
     const { Attributes: todo } = await dbClient
       .delete({
         TableName: todosTable,
-        Key: id as unknown as Key
+        Key: {
+          todoId
+        }
       })
       .promise()
-
-    logger.info({
-      action: 'DELETE',
-      todo
-    })
 
     return todo as TodoItem
   }
