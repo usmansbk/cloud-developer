@@ -7,8 +7,7 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
 import { Key } from 'aws-sdk/clients/dynamodb'
-
-// TODO: Implement businessLogic
+import { getAttachmentUrl, getUploadUrl } from './attachmentUtils'
 
 const logger = createLogger('businessLogic')
 
@@ -37,12 +36,14 @@ export const createTodo = async (
 ): Promise<TodoItem> => {
   logger.info('createTodo')
   try {
+    const todoId = uuid.v4()
     const todo = await TodosAccess.create({
       ...input,
       userId,
-      todoId: uuid.v4(),
+      todoId,
       createdAt: new Date().toISOString(),
-      done: false
+      done: false,
+      attachmentUrl: getAttachmentUrl(`${userId}/${todoId}`)
     })
 
     return todo
@@ -84,4 +85,9 @@ export const deleteTodo = async (todoId: string, userId: string) => {
     logger.error((e as Error).message)
     throw new createError.BadRequest('Failed to delete todo')
   }
+}
+
+export const createAttachmentPresignedUrl = (todoId: string): string => {
+  logger.info('getSignedUrl', todoId)
+  return getUploadUrl(todoId)
 }
