@@ -19,10 +19,15 @@ export const getTodosForUser = async (
 ): Promise<{ items: TodoItem[]; nextKey: string | null }> => {
   logger.info('getTodosForUser')
   try {
-    return TodosAccess.getManyByUserId(userId, nextKey, limit)
+    const result = await TodosAccess.getManyByUserId(userId, nextKey, limit)
+
+    if (result.items.length === 0) {
+      throw new createError.NotFound("You haven't created any todos yet")
+    }
+    return result
   } catch (e) {
-    logger.error(e)
-    throw new createError.BadRequest(e)
+    logger.error((e as Error).message)
+    throw e
   }
 }
 
@@ -32,16 +37,18 @@ export const createTodo = async (
 ): Promise<TodoItem> => {
   logger.info('createTodo')
   try {
-    return TodosAccess.create({
+    const todo = await TodosAccess.create({
       ...input,
       userId,
       todoId: uuid.v4(),
       createdAt: new Date().toISOString(),
       done: false
     })
+
+    return todo
   } catch (e) {
-    logger.error(e)
-    throw new createError.BadRequest(e)
+    logger.error((e as Error).message)
+    throw new createError.BadRequest('Failed to create todo')
   }
 }
 
@@ -52,19 +59,29 @@ export const updateTodo = async (
 ): Promise<TodoItem> => {
   logger.info('updateTodo')
   try {
-    return TodosAccess.update(todoId, userId, input)
+    const isValidTodoId = await TodosAccess.exists(todoId)
+
+    if (!isValidTodoId) {
+      throw new createError.BadRequest('Invalid Todo ID')
+    }
+
+    const todo = await TodosAccess.update(todoId, userId, input)
+
+    return todo
   } catch (e) {
-    logger.error(e)
-    throw new createError.BadRequest(e)
+    logger.error((e as Error).message)
+    throw e
   }
 }
 
 export const deleteTodo = async (todoId: string, userId: string) => {
   logger.info('deleteTodo')
   try {
-    return TodosAccess.delete(todoId, userId)
+    const todo = await TodosAccess.delete(todoId, userId)
+
+    return todo
   } catch (e) {
-    logger.error(e)
-    throw new createError.BadRequest(e)
+    logger.error((e as Error).message)
+    throw new createError.BadRequest('Failed to delete todo')
   }
 }

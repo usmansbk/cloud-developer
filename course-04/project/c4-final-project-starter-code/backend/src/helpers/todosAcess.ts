@@ -37,7 +37,11 @@ export class TodosAccess {
       .query({
         TableName: todosTable,
         ExclusiveStartKey: after,
-        Limit: limit
+        Limit: limit,
+        KeyConditionExpression: 'userId = :userId',
+        ExpressionAttributeValues: {
+          ':userId': userId
+        }
       })
       .promise()
 
@@ -104,5 +108,18 @@ export class TodosAccess {
       .promise()
 
     return todo as TodoItem
+  }
+
+  static async exists(todoId: string): Promise<boolean> {
+    const result = await dbClient
+      .get({
+        TableName: todosTable,
+        Key: {
+          todoId
+        }
+      })
+      .promise()
+
+    return !!result.Item
   }
 }
