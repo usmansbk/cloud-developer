@@ -1,31 +1,65 @@
 import { TodosAccess } from './todosAcess'
-import { AttachmentUtils } from './attachmentUtils'
+// import { AttachmentUtils } from './attachmentUtils'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
+import { Key } from 'aws-sdk/clients/dynamodb'
 
 // TODO: Implement businessLogic
 
-const logger = createLogger(process.env.APP_NAME)
+const logger = createLogger('Todos')
 
-export const getTodosForUser = async (id: string) => {
-  logger.info(id)
+export const getTodosForUser = async (
+  id: string,
+  nextKey: Key | null,
+  limit: number
+): Promise<{ items: TodoItem[]; nextKey: string | null }> => {
+  try {
+    return TodosAccess.getManyByUserId(id, nextKey, limit)
+  } catch (e) {
+    logger.error(e)
+    throw new createError.BadRequest(e)
+  }
 }
 
-export const createTodo = async (input: CreateTodoRequest, userId: string) => {
-  logger.info({ ...input, userId, id: uuid() })
+export const createTodo = async (
+  input: CreateTodoRequest,
+  userId: string
+): Promise<TodoItem> => {
+  try {
+    return TodosAccess.create({
+      ...input,
+      userId,
+      todoId: uuid.v4(),
+      createdAt: new Date().toISOString(),
+      done: false
+    })
+  } catch (e) {
+    logger.error(e)
+    throw new createError.BadRequest(e)
+  }
 }
 
-export const updateTodo = async (id: string, input: UpdateTodoRequest) => {
-  logger.info({
-    id,
-    ...input
-  })
+export const updateTodo = async (
+  id: string,
+  input: UpdateTodoRequest
+): Promise<TodoItem> => {
+  try {
+    return TodosAccess.update(id, input)
+  } catch (e) {
+    logger.error(e)
+    throw new createError.BadRequest(e)
+  }
 }
 
 export const deleteTodo = async (id: string) => {
-  logger.info(id)
+  try {
+    return TodosAccess.delete(id)
+  } catch (e) {
+    logger.error(e)
+    throw new createError.BadRequest(e)
+  }
 }
