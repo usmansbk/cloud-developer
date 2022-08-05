@@ -5,18 +5,18 @@ import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
 import { getTodosForUser } from '../../helpers/todos'
-import { getUserId } from '../utils'
+import { getUserId, parseLimitParameter, parseNextKeyParameter } from '../utils'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const id = getUserId(event)
-    const todos = await getTodosForUser(id)
+    const nextKey = parseNextKeyParameter(event)
+    const limit = parseLimitParameter(event) || 20
+    const result = await getTodosForUser(id, nextKey, limit)
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        todos
-      })
+      body: JSON.stringify(result)
     }
   }
 )
