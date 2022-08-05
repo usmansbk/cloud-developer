@@ -12,13 +12,11 @@ export const handler = middy(
     const todoId = event.pathParameters.todoId
     const userId = getUserId(event)
 
-    const result = await deleteTodo(todoId, userId)
+    const todo = await deleteTodo(todoId, userId)
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        result
-      })
+      body: JSON.stringify({ todo })
     }
   }
 )
