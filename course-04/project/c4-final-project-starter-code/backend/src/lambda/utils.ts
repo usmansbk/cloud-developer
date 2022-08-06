@@ -24,7 +24,7 @@ export function getUserId(event: APIGatewayProxyEvent): string {
  *
  * @returns {string} a value of a query parameter value or "undefined" if a parameter is not defined
  */
-function getQueryParameter(event: APIGatewayProxyEvent, name: string) {
+function getQueryParameter(event: APIGatewayProxyEvent, name: string): string {
   const queryParams = event.queryStringParameters
   if (!queryParams) {
     return undefined
