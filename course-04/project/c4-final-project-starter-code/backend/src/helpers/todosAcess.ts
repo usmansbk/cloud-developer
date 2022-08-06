@@ -12,8 +12,6 @@ const todosTable = process.env.TODOS_TABLE
 
 const logger = createLogger('TodosAccess')
 
-// TODO: Implement the dataLayer logic
-
 function encodeNextKey(key: Key) {
   if (key) {
     return encodeURIComponent(JSON.stringify(key))
@@ -84,6 +82,12 @@ export class TodosAccess {
         Key: {
           todoId,
           userId
+        },
+        UpdateExpression: 'set name = :name, dueDate = :dueDate, done = :done',
+        ExpressionAttributeValues: {
+          ':name': attributes.name,
+          ':dueDate': attributes.dueDate,
+          ':done': attributes.done
         }
       })
       .promise()
@@ -141,7 +145,9 @@ export class TodosAccess {
         Key: {
           todoId,
           userId
-        }
+        },
+        UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+        ExpressionAttributeValues: { ':attachmentUrl': url }
       })
       .promise()
 
