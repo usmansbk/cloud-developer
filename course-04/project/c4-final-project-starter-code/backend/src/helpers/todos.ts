@@ -1,5 +1,5 @@
 import { TodosAccess } from './todosAcess'
-// import { AttachmentUtils } from './attachmentUtils'
+import { AttachmentUtils } from './attachmentUtils'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
@@ -7,7 +7,6 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
 import { Key } from 'aws-sdk/clients/dynamodb'
-import { getAttachmentUrl, getUploadUrl } from './attachmentUtils'
 
 const logger = createLogger('businessLogic')
 
@@ -43,7 +42,7 @@ export const createTodo = async (
       todoId,
       createdAt: new Date().toISOString(),
       done: false,
-      attachmentUrl: getAttachmentUrl(`${userId}/${todoId}`)
+      attachmentUrl: AttachmentUtils.getAttachmentUrl(`${userId}/${todoId}`)
     })
 
     return todo
@@ -87,7 +86,7 @@ export const deleteTodo = async (todoId: string, userId: string) => {
   }
 }
 
-export const createAttachmentPresignedUrl = (todoId: string): string => {
-  logger.info('getSignedUrl', todoId)
-  return getUploadUrl(todoId)
+export const createAttachmentPresignedUrl = (attachmentKey: string): string => {
+  logger.info('getSignedUrl', attachmentKey)
+  return AttachmentUtils.getUploadUrl(attachmentKey)
 }

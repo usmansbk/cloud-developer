@@ -10,14 +10,16 @@ const s3 = new AWS.S3({
   signatureVersion: 'v4'
 })
 
-export function getUploadUrl(todoId: string): string {
-  return s3.getSignedUrl('putObject', {
-    Bucket: bucket,
-    Expires: expires,
-    Key: todoId
-  })
-}
+export class AttachmentUtils {
+  static getUploadUrl(todoId: string): string {
+    return s3.getSignedUrl('putObject', {
+      Bucket: bucket,
+      Expires: expires,
+      Key: todoId
+    })
+  }
 
-export function getAttachmentUrl(attachmentKey: string): string {
-  return `https://${bucket}.s3.amazonaws.com/${attachmentKey}`
+  static getAttachmentUrl(attachmentKey: string): string {
+    return `https://${bucket}.s3.amazonaws.com/${attachmentKey}`
+  }
 }
