@@ -58,8 +58,8 @@ export const createTodo = async (
 export const updateTodo = async (
   todoId: string,
   userId: string,
-  input: UpdateTodoRequest
-): Promise<TodoItem> => {
+  values: UpdateTodoRequest
+) => {
   logger.info('updateTodo')
   try {
     const isValidTodoId = await TodosAccess.exists(todoId)
@@ -68,13 +68,13 @@ export const updateTodo = async (
       throw new createError.BadRequest('Invalid Todo ID')
     }
 
-    const todo = await TodosAccess.update(todoId, userId, input)
+    await TodosAccess.update(todoId, userId, values)
 
     logger.info('Todo updated', {
       todoId,
-      userId
+      userId,
+      values
     })
-    return todo
   } catch (e) {
     logger.error((e as Error).message)
     throw e
@@ -84,13 +84,12 @@ export const updateTodo = async (
 export const deleteTodo = async (todoId: string, userId: string) => {
   logger.info('deleteTodo')
   try {
-    const todo = await TodosAccess.delete(todoId, userId)
+    await TodosAccess.delete(todoId, userId)
 
     logger.info('Todo deleted', {
       todoId,
       userId
     })
-    return todo
   } catch (e) {
     logger.error((e as Error).message)
     throw new createError.BadRequest('Failed to delete todo')

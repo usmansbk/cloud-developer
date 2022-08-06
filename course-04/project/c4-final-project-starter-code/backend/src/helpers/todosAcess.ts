@@ -55,28 +55,24 @@ export class TodosAccess {
       item
     })
 
-    const { Attributes: todo } = await dbClient
+    await dbClient
       .put({
         TableName: todosTable,
         Item: item
       })
       .promise()
 
-    return todo as TodoItem
+    return item
   }
 
-  static async update(
-    todoId: string,
-    userId: string,
-    attributes: TodoUpdate
-  ): Promise<TodoItem> {
+  static async update(todoId: string, userId: string, values: TodoUpdate) {
     logger.info({
       action: 'Update',
       todoId,
-      attributes
+      values
     })
 
-    const { Attributes: todo } = await dbClient
+    await dbClient
       .update({
         TableName: todosTable,
         Key: {
@@ -85,23 +81,21 @@ export class TodosAccess {
         },
         UpdateExpression: 'set name = :name, dueDate = :dueDate, done = :done',
         ExpressionAttributeValues: {
-          ':name': attributes.name,
-          ':dueDate': attributes.dueDate,
-          ':done': attributes.done
+          ':name': values.name,
+          ':dueDate': values.dueDate,
+          ':done': values.done
         }
       })
       .promise()
-
-    return todo as TodoItem
   }
 
-  static async delete(todoId: string, userId: string): Promise<TodoItem> {
+  static async delete(todoId: string, userId: string) {
     logger.info({
       action: 'Delete',
       todoId
     })
 
-    const { Attributes: todo } = await dbClient
+    await dbClient
       .delete({
         TableName: todosTable,
         Key: {
@@ -110,8 +104,6 @@ export class TodosAccess {
         }
       })
       .promise()
-
-    return todo as TodoItem
   }
 
   static async exists(todoId: string): Promise<boolean> {
