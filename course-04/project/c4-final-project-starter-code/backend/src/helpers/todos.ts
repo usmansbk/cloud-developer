@@ -59,7 +59,7 @@ export const updateTodo = async (
 ) => {
   logger.info('updateTodo')
   try {
-    const isValidTodoId = await TodosAccess.exists(todoId)
+    const isValidTodoId = await TodosAccess.exists(todoId, userId)
 
     if (!isValidTodoId) {
       throw new createError.BadRequest('Invalid Todo ID')

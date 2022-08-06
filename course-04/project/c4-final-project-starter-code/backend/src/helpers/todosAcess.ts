@@ -106,12 +106,13 @@ export class TodosAccess {
       .promise()
   }
 
-  static async exists(todoId: string): Promise<boolean> {
+  static async exists(todoId: string, userId: string): Promise<boolean> {
     const result = await dbClient
       .get({
         TableName: todosTable,
         Key: {
-          todoId
+          todoId,
+          userId
         }
       })
       .promise()
