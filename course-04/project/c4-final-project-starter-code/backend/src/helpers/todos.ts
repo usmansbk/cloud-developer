@@ -31,7 +31,12 @@ export const createTodo = async (
   userId: string
 ): Promise<TodoItem> => {
   logger.info('createTodo')
+
   try {
+    if (input.name.trim().length === 0) {
+      throw new createError.BadRequest('Name cannot be empty')
+    }
+
     const todoId = uuid.v4()
     const todo = await TodosAccess.create({
       ...input,
@@ -48,7 +53,7 @@ export const createTodo = async (
     return todo
   } catch (e) {
     logger.error((e as Error).message)
-    throw new createError.BadRequest('Failed to create todo')
+    throw new createError.BadRequest(`Failed to create todo: ${e.message}`)
   }
 }
 
@@ -74,7 +79,7 @@ export const updateTodo = async (
     })
   } catch (e) {
     logger.error((e as Error).message)
-    throw e
+    throw new createError.BadRequest(`Failed to update todo: ${e.message}`)
   }
 }
 
