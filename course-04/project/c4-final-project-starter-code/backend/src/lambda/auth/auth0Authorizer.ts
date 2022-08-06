@@ -9,10 +9,10 @@ import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://dev-hbua3ix0.us.auth0.com/.well-known/jwks.json'
+const jwksUri = 'https://dev-hbua3ix0.us.auth0.com/.well-known/jwks.json'
 
 const client = jwksClient({
-  jwksUri: jwksUrl
+  jwksUri
 })
 
 export const handler = async (
@@ -60,7 +60,9 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
   const key = await client.getSigningKey(jwt.header.kid)
 
-  return verify(token, key.getPublicKey()) as JwtPayload
+  return verify(token, key.getPublicKey(), {
+    algorithms: ['RS256']
+  }) as JwtPayload
 }
 
 function getToken(authHeader: string): string {
