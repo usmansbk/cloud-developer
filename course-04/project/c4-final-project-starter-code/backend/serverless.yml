@@ -1,5 +1,5 @@
 org: usmansbk
-app: serverless-todo-app
+app: todo-app
 service: serverless-todo-app
 
 plugins:
@@ -24,7 +24,7 @@ provider:
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: todos-app-images-babakolo-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   logs:
@@ -175,17 +175,18 @@ resources:
       Properties:
         BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
         CorsConfiguration:
-          - AllowedOrigins:
-              - '*'
-            AllowedHeaders:
-              - '*'
-            AllowedMethods:
-              - 'GET'
-              - 'PUT'
-              - 'POST'
-              - 'DELETE'
-              - 'HEAD'
-            MaxAge: 3000
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - 'GET'
+                - 'PUT'
+                - 'POST'
+                - 'DELETE'
+                - 'HEAD'
+              MaxAge: 3000
 
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
