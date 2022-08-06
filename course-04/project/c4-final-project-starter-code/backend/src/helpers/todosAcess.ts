@@ -122,4 +122,29 @@ export class TodosAccess {
 
     return !!result.Item
   }
+
+  static async updateAttachment(
+    todoId: string,
+    userId: string,
+    url: string
+  ): Promise<TodoItem> {
+    logger.info({
+      action: 'Update',
+      todoId,
+      userId,
+      url
+    })
+
+    const { Attributes: todo } = await dbClient
+      .update({
+        TableName: todosTable,
+        Key: {
+          todoId,
+          userId
+        }
+      })
+      .promise()
+
+    return todo as TodoItem
+  }
 }

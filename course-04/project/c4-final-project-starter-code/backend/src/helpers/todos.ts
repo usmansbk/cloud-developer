@@ -41,8 +41,7 @@ export const createTodo = async (
       userId,
       todoId,
       createdAt: new Date().toISOString(),
-      done: false,
-      attachmentUrl: AttachmentUtils.getAttachmentUrl(`${userId}/${todoId}`)
+      done: false
     })
 
     return todo
@@ -86,7 +85,22 @@ export const deleteTodo = async (todoId: string, userId: string) => {
   }
 }
 
-export const createAttachmentPresignedUrl = (attachmentKey: string): string => {
-  logger.info('getSignedUrl', attachmentKey)
-  return AttachmentUtils.getUploadUrl(attachmentKey)
+export const createAttachmentPresignedUrl = async (
+  userId: string,
+  todoId: string
+): Promise<string> => {
+  logger.info('createAttachmentPresignedUrl')
+
+  try {
+    const uploadUrl = AttachmentUtils.getUploadUrl(todoId)
+    const attachmentUrl = AttachmentUtils.getAttachmentUrl(todoId)
+    await TodosAccess.updateAttachment(todoId, userId, attachmentUrl)
+
+    return uploadUrl
+  } catch (e) {
+    logger.error((e as Error).message)
+    throw new createError.BadRequest(
+      'Failed to create attachment presigned url'
+    )
+  }
 }

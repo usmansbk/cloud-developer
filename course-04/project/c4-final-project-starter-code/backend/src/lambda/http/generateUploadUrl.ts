@@ -12,7 +12,7 @@ export const handler = middy(
     const todoId = event.pathParameters.todoId
 
     const userId = getUserId(event)
-    const uploadUrl = createAttachmentPresignedUrl(`${userId}/${todoId}`)
+    const uploadUrl = await createAttachmentPresignedUrl(userId, todoId)
 
     return {
       statusCode: 201,
