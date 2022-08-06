@@ -44,6 +44,10 @@ export const createTodo = async (
       done: false
     })
 
+    logger.info('Todo created', {
+      userId,
+      input
+    })
     return todo
   } catch (e) {
     logger.error((e as Error).message)
@@ -66,6 +70,10 @@ export const updateTodo = async (
 
     const todo = await TodosAccess.update(todoId, userId, input)
 
+    logger.info('Todo updated', {
+      todoId,
+      userId
+    })
     return todo
   } catch (e) {
     logger.error((e as Error).message)
@@ -78,6 +86,10 @@ export const deleteTodo = async (todoId: string, userId: string) => {
   try {
     const todo = await TodosAccess.delete(todoId, userId)
 
+    logger.info('Todo deleted', {
+      todoId,
+      userId
+    })
     return todo
   } catch (e) {
     logger.error((e as Error).message)
@@ -96,6 +108,12 @@ export const createAttachmentPresignedUrl = async (
     const attachmentUrl = AttachmentUtils.getAttachmentUrl(todoId)
     await TodosAccess.updateAttachment(todoId, userId, attachmentUrl)
 
+    logger.info('Attachment url updated', {
+      uploadUrl,
+      attachmentUrl,
+      userId,
+      todoId
+    })
     return uploadUrl
   } catch (e) {
     logger.error((e as Error).message)
