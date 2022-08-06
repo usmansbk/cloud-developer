@@ -19,9 +19,6 @@ export const getTodosForUser = async (
   try {
     const result = await TodosAccess.getManyByUserId(userId, nextKey, limit)
 
-    if (result.items.length === 0) {
-      throw new createError.NotFound("You haven't created any todos yet")
-    }
     return result
   } catch (e) {
     logger.error((e as Error).message)
